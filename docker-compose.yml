@@ -1,27 +1,21 @@
-version: '3'
+version: "3.3"
 
 services:
-  rootstalk-static:
-    image: mcfatem/rootstalk:latest
-    container_name: rootstalk-static
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
+  blogsMcFateM:
+    image: mcfatem/blogs-mcfatem
+    container_name: blogsMcFateM
     networks:
       - proxy
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./data:/data
     labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=proxy"
-      - "traefik.http.routers.rootstalk-static-secure.entrypoints=https"
-      - "traefik.http.routers.rootstalk-static-secure.rule=Host(`rootstalk-static.grinnell.edu`)"
-      - "traefik.http.routers.rootstalk-static-secure.tls=true"
-      - "traefik.http.routers.rootstalk-static-secure.tls.certresolver=http"
-      - "traefik.http.routers.rootstalk-static-secure.service=rootstalk-static_rootstalk-static"
-      - "com.centurylinklabs.watchtower.enable=true"
+      traefik.enable: "true"
+      traefik.docker.network: "proxy"
+      traefik.http.routers.blog.rule: "Host(`${HOST}`) && PathPrefix(`/blogs/McFateM`)"
+      traefik.http.routers.blog.middlewares: "blog-stripprefix"
+      traefik.http.routers.blog.service: "blogsMcFateM-blogs-mcfatem"
+      traefik.http.middlewares.blog-stripprefix.stripprefix.prefixes: "/blogs/McFateM"
+      traefik.http.routers.blog.entrypoints: "websecure"
+      traefik.http.routers.blog.tls: "true"
+      com.centurylinklabs.watchtower.enable: "true"
 
 networks:
   proxy:
